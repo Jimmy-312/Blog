@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>元胞自动机 | J-Station</title><meta name="description" content="简要说说元胞自动机（CA）模型"><meta name="keywords" content="工高班,工高,实践面试,元胞自动机,介绍"><meta name="author" content="Jimmy JiaLe"><meta name="copyright" content="Jimmy JiaLe"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/jimmy-312/Blog/img/tou.ico"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="http://ta.qq.com"/><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="crossorigin"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="baidu-site-verification" content="BRjANCGFC0"/><meta name="twitter:card" content="summary"><meta name="twitter:title" content="元胞自动机"><meta name="twitter:description" content="简要说说元胞自动机（CA）模型"><meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg"><meta property="og:type" content="article"><meta property="og:title" content="元胞自动机"><meta property="og:url" content="https://jsta.ml/2020/03/28/cellular%20automata/"><meta property="og:site_name" content="J-Station"><meta property="og:description" content="简要说说元胞自动机（CA）模型"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg"><script src="https://cdn.jsdelivr.net/npm/js-cookie/dist/js.cookie.min.js"></script><script>var autoChangeMode = '1'
+var t = Cookies.get("theme")
+if (autoChangeMode == '1'){
+  var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+  var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches
+  var isNotSpecified = window.matchMedia("(prefers-color-scheme: no-preference)").matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined){
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport){
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour < 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+  }
+  } else if (t == 'light') activateLightMode()
+  else activateDarkMode()
+
+} else if (autoChangeMode == '2'){
+  now = new Date();
+  hour = now.getHours();
+  isNight = hour < 6 || hour >= 18
+  if(t === undefined) isNight? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode() 
+} else {
+  if ( t == 'dark' ) activateDarkMode()
+  else if ( t == 'light') activateLightMode()
+}
+
+function activateDarkMode(){
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+    document.querySelector('meta[name="theme-color"]').setAttribute('content','#000')
+  }
+}
+function activateLightMode(){
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+  document.querySelector('meta[name="theme-color"]').setAttribute('content','#fff')
+  }
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css"><link rel="canonical" href="https://jsta.ml/2020/03/28/cellular%20automata/"><link rel="next" title="工高报名表填写感想" href="https://jsta.ml/2020/03/18/acee-1/"><script src="https://tajs.qq.com/stats?sId=66529360" charset="UTF-8"></script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: true,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: {"bookmark":{"message_prev":"按","message_next":"键将本页加入书签"},"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#2d3035","position":"bottom-left"},
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  highlightShrink: 'false',
+  isFontAwesomeV5: true,
+  isPhotoFigcaption: false
+  
+}</script><script>var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isSidebar: true  
+  }</script><noscript><style>
+#page-header {
+  opacity: 1
+}
+.justified-gallery img{
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 4.2.0"></head><body><canvas class="fireworks"></canvas><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="/img/tou.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">3</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">11</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page"><i class="fa-fw fa fa-list" aria-hidden="true"></i><span> 文章</span><i class="fa fa-chevron-down menus-expand" aria-hidden="true"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page"><i class="fa-fw fa fa-list" aria-hidden="true"></i><span> 娱乐</span><i class="fa fa-chevron-down menus-expand" aria-hidden="true"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fa fa-film"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div></div></div></div><i class="fa fa-arrow-right on" id="toggle-sidebar" aria-hidden="true">     </i><div id="sidebar"><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#写在前面"><span class="toc-number">1.</span> <span class="toc-text">写在前面</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#元胞自动机（CA）"><span class="toc-number">2.</span> <span class="toc-text">元胞自动机（CA）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#一维元胞自动机"><span class="toc-number">2.1.</span> <span class="toc-text">一维元胞自动机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#投票机"><span class="toc-number">2.1.1.</span> <span class="toc-text">投票机</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#随便说说"><span class="toc-number">2.2.</span> <span class="toc-text">随便说说</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#写在最后"><span class="toc-number">3.</span> <span class="toc-text">写在最后</span></a></li></ol></div></div></div><div id="body-wrap"><div class="post-bg" id="nav" style="background-image: url(https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg)"><div id="page-header"><span class="pull_left" id="blog_name"><a class="blog_title" id="site-name" href="/">J-Station</a></span><span class="pull_right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page"><i class="fa-fw fa fa-list" aria-hidden="true"></i><span> 文章</span><i class="fa fa-chevron-down menus-expand" aria-hidden="true"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page"><i class="fa-fw fa fa-list" aria-hidden="true"></i><span> 娱乐</span><i class="fa fa-chevron-down menus-expand" aria-hidden="true"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fa fa-film"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> 关于我</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fa fa-bars fa-fw" aria-hidden="true"></i></a></span></span></div><div id="post-info"><div id="post-title"><div class="posttitle">元胞自动机</div></div><div id="post-meta"><div class="meta-firstline"><time class="post-meta__date"><span class="post-meta__date-created" title="发表于 2020-03-28 10:03:33"><i class="fa fa-calendar" aria-hidden="true"></i> 发表于 2020-03-28</span><span class="post-meta__separator">|</span><span class="post-meta__date-updated" title="更新于 2020-03-30 11:28:35"><i class="fa fa-history" aria-hidden="true"></i> 更新于 2020-03-30</span></time><span class="post-meta__categories"><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/%E5%B7%A5%E9%AB%98%E6%8A%A5%E5%90%8D%E7%9B%B8%E5%85%B3/">工高报名相关</a></span></div><div class="meta-secondline"> </div><div class="meta-thirdline"><span class="post-meta-pv-cv"><i class="fa fa-eye post-meta__icon" aria-hidden="true"> </i><span>阅读量:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-commentcount"><span class="post-meta__separator">|</span><i class="post-meta__icon far fa-comments" aria-hidden="true"></i><span>评论数:</span><a href="/2020/03/28/cellular%20automata/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count comment-count" data-xid="/2020/03/28/cellular%20automata/" itemprop="commentCount"></span></a></span></div></div></div></div><main class="layout_post" id="content-inner"><article id="post"><div id="article-container"><h1 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h1><p>刚刚结束了工高的第二轮面试——实践面试，整一个面试是要求一个团队一起合作在三天内完成几道数学建模题，过程特肝，我真的可能把每道题的分析都码上来了。所以我就简要的提一下其中接触到的知识吧。今天，我就来简要说说[^元胞自动机] 的一些知识吧。</p>
+<h1 id="元胞自动机（CA）"><a href="#元胞自动机（CA）" class="headerlink" title="元胞自动机（CA）"></a>元胞自动机（CA）</h1><p>它是一种时间、空间、状态都离散的，空间相互作用和因果关系为局部的网格动力学模型。其中重要的部分是规则和邻居，这两个要素决定了元胞自动机的演化过程。其最出名的便是非常流行的“生命游戏”。</p>
+<h2 id="一维元胞自动机"><a href="#一维元胞自动机" class="headerlink" title="一维元胞自动机"></a>一维元胞自动机</h2><p>为了简化，所以从简单的一维元胞自动机说起。</p>
+<p>其是由一行元胞构成，每个元胞的状态有1或0两个状态 ，这整一行元胞就构成了一个元胞自动机。其下一代的演化方式是由每个元胞相邻的N个元胞状态和自身的状态形成的N+1邻域共同决定。</p>
+<p>当N=2时，即每个元胞和其相邻的左右两个元胞的状态决定下一代的状态，具体如何生成呢，这里先用一种简单的规则加以展示。</p>
+<blockquote>
+<p>很容易得到，3邻域的元胞状态总共有2^3=8种状态，如下：</p>
+<p>000   001   010   011   100   101   110   111</p>
+<p>其每一个状态都决定下一代状态，如</p>
+<p>  0       0       0       0       1       1       1       1</p>
+<p>那么规则就可以以00001111来表示，称其为规则数。</p>
+</blockquote>
+<p>以上就是一种产生规则，但是我们很快会发现这样会遇到一个问题，在两端的会出现相邻元胞数不足的现象。此时一般会采用首尾相连的方式来解决。</p>
+<h3 id="投票机"><a href="#投票机" class="headerlink" title="投票机"></a>投票机</h3><p>为了更好的理解元胞自动机，这里用一个简单的案例来展示。</p>
+<blockquote>
+<p>一个有 n 个元胞的一维元胞自动机，能较好实现“少数服从多数”的任务：若输入（t0 = 0）中 状态为 1 的元胞多于状态为 0 的元胞，则经过 t 次运算后所有元胞状态为 1；同理，若输入（t0 = 0） 中状态为 0 的元胞多于状态为 1 的元胞，则经过 t 次运算后所有元胞状态为 0。请制定规则，使得适应度尽可能的高。</p>
+</blockquote>
+<p>根据上面的解释，大家可以自行尝试。</p>
+<p>这里我给出最优解法：</p>
+<ul>
+<li>选取7邻域作为决定下一代的状态组，这样规则数就有2^7=128位</li>
+</ul>
+<blockquote>
+<p>规则数：</p>
+<p>00000101000001100001010110000111000001110000010000010101010101</p>
+<p>110110010001110111000001010000000101111101111111111011011101111111</p>
+</blockquote>
+<ul>
+<li>接下来既可以采取首尾相连的方式也可以，稍微与元胞自动机定义有所差别的整体优势补全法，即用上一代状态中占优势的状态来补齐首尾。</li>
+<li>之所以有所不妥，是因为这里有点类似[^冯诺依曼机]的一步到位的想法，但是采取这样的方法可以使适应度达到<strong>100%</strong>，所以这里就采用了整体优势补全的方法。</li>
+</ul>
+<p>以下是Python实现代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> randint</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getBirth</span><span class="params">(N)</span>:</span></span><br><span class="line">    f=<span class="number">-1</span> </span><br><span class="line">    <span class="keyword">while</span> f==<span class="number">-1</span>: <span class="comment">#避免产生1和0数目相同的初始状态</span></span><br><span class="line">        s=<span class="string">''</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">            s+=str(randint(<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">        <span class="keyword">if</span> s.count(<span class="string">'0'</span>)&gt;s.count(<span class="string">'1'</span>):</span><br><span class="line">            f=<span class="number">0</span></span><br><span class="line">        <span class="keyword">elif</span> s.count(<span class="string">'0'</span>)==s.count(<span class="string">'1'</span>):</span><br><span class="line">            f=<span class="number">-1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            f=<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> s,f</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getNext</span><span class="params">(n,f)</span>:</span></span><br><span class="line">    rule=<span class="string">'0000010100000110000101011000\</span></span><br><span class="line"><span class="string">011100000111000001000001010101\</span></span><br><span class="line"><span class="string">010111011001000111011100000101\</span></span><br><span class="line"><span class="string">0000000101111101111111111011011101111111'</span></span><br><span class="line">    nextGeneration=<span class="string">''</span></span><br><span class="line">    N=len(n)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        <span class="comment">#边缘单独考虑补全</span></span><br><span class="line">        <span class="keyword">if</span> i&lt;<span class="number">3</span>:</span><br><span class="line">            s=str(f)*(<span class="number">3</span>-i)+n[<span class="number">0</span>:i]+n[i:i+<span class="number">4</span>]</span><br><span class="line">        <span class="keyword">elif</span> i&gt;N<span class="number">-4</span>:</span><br><span class="line">            s=n[i<span class="number">-3</span>:i]+n[i:N]+str(f)*(<span class="number">3</span>-(N<span class="number">-1</span>-i))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            s=n[i<span class="number">-3</span>:i]+n[i:i+<span class="number">4</span>]</span><br><span class="line">        s=int(s,<span class="number">2</span>)</span><br><span class="line">        nextGeneration+=rule[s]</span><br><span class="line">    <span class="keyword">return</span> nextGeneration</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    num=<span class="number">0</span>; <span class="comment">#记录成功次数</span></span><br><span class="line">    datas=<span class="number">200</span> <span class="comment">#测试数据总数</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(datas):</span><br><span class="line">        N=<span class="number">100</span> <span class="comment">#序列长度</span></span><br><span class="line">        t=<span class="number">0</span>  <span class="comment">#记录时间</span></span><br><span class="line">        n,f=getBirth(N) <span class="comment">#生成初始状态</span></span><br><span class="line">        <span class="keyword">while</span> t&lt;<span class="number">300</span>: <span class="comment">#超过300次，默认判定无法成功</span></span><br><span class="line">            n=getNext(n,f)</span><br><span class="line">            t+=<span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> (f==<span class="number">0</span> <span class="keyword">and</span> n.count(<span class="string">'0'</span>)==N) <span class="keyword">or</span> (f==<span class="number">1</span> <span class="keyword">and</span> n.count(<span class="string">'1'</span>)==N): <span class="comment">#判断是否成功</span></span><br><span class="line">                num+=<span class="number">1</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="comment"># 输出结果</span></span><br><span class="line">    print(<span class="string">'datas sum:'</span>,datas)</span><br><span class="line">    print(int(num/datas*<span class="number">100</span>),<span class="string">'%'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br><span class="line">    input()</span><br></pre></td></tr></table></figure>
+
+<h2 id="随便说说"><a href="#随便说说" class="headerlink" title="随便说说"></a>随便说说</h2><p>这里我就暂时说到这里了<del>主要太懒了，不想码字了</del>，至于规则是如何产生的，各位可以去参考<strong>遗传算法</strong>，我在这里也推荐一本书，讲的挺简单的。</p>
+<blockquote>
+<p>《复杂》    梅拉妮·米歇尔</p>
+<p>《Complexity: A Guided Tour》     Melanie Mitchell</p>
+<p>这上面是一本书哦，只是中英文的区别~</p>
+</blockquote>
+<h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>其实元胞自动机本身并不复杂，但是可以模拟很多复杂的现象，在这次实践面试中还实现了长三角城市建成区的模拟、还有教室逃生的模拟等等，有兴趣的话，可以深入了解。</p>
+<p>这次讲的很浅，等我有兴趣码字了，再详细展开讲讲（逃</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Jimmy JiaLe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://jsta.ml/2020/03/28/cellular%20automata/">https://jsta.ml/2020/03/28/cellular%20automata/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://jsta.ml" target="_blank">J-Station</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%B7%A5%E9%AB%98%E7%8F%AD/">工高班</a><a class="post-meta__tags" href="/tags/%E5%B7%A5%E9%AB%98/">工高</a><a class="post-meta__tags" href="/tags/%E5%AE%9E%E8%B7%B5%E9%9D%A2%E8%AF%95/">实践面试</a><a class="post-meta__tags" href="/tags/%E5%85%83%E8%83%9E%E8%87%AA%E5%8A%A8%E6%9C%BA/">元胞自动机</a><a class="post-meta__tags" href="/tags/%E4%BB%8B%E7%BB%8D/">介绍</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"/><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js"></script></div></div><div class="post-reward"><a class="reward-button button--primary button--animated"> <i class="fa fa-qrcode"></i> 打赏<div class="reward-main"><ul class="reward-all"><li class="reward-item"><img class="lazyload post-qr-code__img" src="/img/wechat.jpg" alt="微信"/><div class="post-qr-code__desc">微信</div></li><li class="reward-item"><img class="lazyload post-qr-code__img" src="/img/alipay.jpg" alt="支付寶"/><div class="post-qr-code__desc">支付寶</div></li></ul></div></a></div><nav class="pagination_post" id="pagination"><div class="next-post pull-full"><a href="/2020/03/18/acee-1/"><img class="next_cover lazyload" data-src="https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">工高报名表填写感想</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fa fa-fw fa-thumbs-up" aria-hidden="true"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/2020/03/18/acee-1/" title="工高报名表填写感想"><img class="relatedPosts_cover lazyload"data-src="https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-03-18</div><div class="relatedPosts_title">工高报名表填写感想</div></div></a></div></div><div class="clear_both"></div></div><hr><div id="post-comment"><div class="comment_headling"><i class="fa fa-comments fa-fw" aria-hidden="true"></i><span> 评论</span></div><div class="vcomment" id="vcomment"></div><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var GUEST_INFO = ['nick','mail','link'];
+var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+  return GUEST_INFO.indexOf(item) > -1
+});
+guest_info = guest_info.length == 0 ? GUEST_INFO :guest_info;
+
+window.valine = new Valine({
+  el:'#vcomment',
+  notify: false,
+  verify: false,
+  appId: 'NM0DGCs7gojNJutcFPq9O1kX-MdYXbMMI',
+  appKey: 'zJYAI45nLIlsoJYEwP9M2pV0',
+  placeholder: '快来评论吧！若在上方留下邮箱，你会收到新回复提醒哦~',
+  avatar: 'monsterid',
+  meta: guest_info,
+  pageSize: '10',
+  lang: 'zh-cn',
+  recordIP: false,
+  serverURLs: ''
+});</script></div></article></main><footer id="footer" style="background-image: url(https://cdn.jsdelivr.net/gh/jimmy-312/jimmy-312.github.io/img/acee.jpg)" data-type="photo"><div id="footer-wrap"><div class="copyright">&copy;2020 By Jimmy JiaLe</div><div class="framework-info"><span>驱动 </span><a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly" target="_blank" rel="noopener"><span>Butterfly</span></a></div><div class="footer_custom_text"><a href="https://jimmy-312.github.com/" target="_blank" rel="noopener">早日摆脱废物！</a></div></div></footer></div><section class="rightside" id="rightside"><div id="rightside-config-hide"><i class="fa fa-book" id="readmode" title="阅读模式"></i><i class="fa fa-plus" id="font_plus" title="放大字体"></i><i class="fa fa-minus" id="font_minus" title="缩小字体"></i><i class="darkmode far fa-moon" id="darkmode" title="夜间模式"></i></div><div id="rightside-config-show"><div id="rightside_config" title="设置"><i class="fa fa-cog" aria-hidden="true"></i></div><a id="to_comment" href="#post-comment" title="直达评论"><i class="scroll_to_comment fa fa-comments">  </i></a><i class="fa fa-list-ul close" id="mobile-toc-button" title="目录" aria-hidden="true"></i><i class="fa fa-arrow-up" id="go-up" title="回到顶部" aria-hidden="true"></i></div></section><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="https://cdn.jsdelivr.net/gh/jerryc127/butterfly_cdn@2.1.0/js/fireworks.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script id="ribbon_piao" mobile="false" src="https://cdn.jsdelivr.net/gh/jerryc127/butterfly_cdn@2.1.0/js/piao.js"></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@latest/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/lazysizes@latest/lazysizes.min.js" async=""></script><script src="/"></script><script>document.addEventListener('DOMContentLoaded', function() {
+      pangu.spacingElementById('content-inner')
+})</script><script>if (document.getElementsByClassName('mermaid').length) {
+  loadScript('',function () {
+    mermaid.initialize({
+      theme: 'default',
+  })
+})
+}</script></body></html>
